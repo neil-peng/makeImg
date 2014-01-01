@@ -43,12 +43,11 @@ static bool makeDynamicSqlAndMc(MYSQL* sqlIns , memcached_st* mcIns, uint32_t pi
     if(makeWeightMc(mcIns,pid,weight)!=true)
         return false;
     return ret;
-
 }
 
 
 
-static bool Worker::_processImg(const std::string& inPath,uint32_t index, const std::string& imgName, uint32_t pid, MYSQL* sqlIns,memcached_st* mcIns)
+static bool Worker::_processImg(const std::string& inPath,uint32_t index, const std::string& imgName, uint32_t pid, MYSQL* sqlIns,memcached_st* mcIns,int wt,int ht)
 {
     char indexDir[1024]={0};
     char showDir[1024]={0};
@@ -74,7 +73,7 @@ static bool Worker::_processImg(const std::string& inPath,uint32_t index, const 
     makeStaicSql(sqlIns,pid,sImgname,_sqlSplit);    
     makeDynamicSqlAndMc(sqlIns, mcIns, pid,_pageCount,_sqlSplit);
 
-    if(! proImg.reSize(420,280) )
+    if(! proImg.reSize(wt,ht) )
         return false;
     
     if(! proImg.saveDstImg(smallImg,smallDirFull))
@@ -86,7 +85,7 @@ static bool Worker::_processImg(const std::string& inPath,uint32_t index, const 
 }
 
 
-static void Worker::_proessCb( MYSQL* sqlIns ,memcached_st* mcIns)
+static void Worker::_proessCb( MYSQL* sqlIns ,memcached_st* mcIns,int wt,int ht)
 {	
 	int emptyTime=0;
     while(true)
@@ -113,7 +112,7 @@ static void Worker::_proessCb( MYSQL* sqlIns ,memcached_st* mcIns)
             }
 
             std::string imgName = imgPath.substr(dirPos+1,pos-dirPos-1);
-            if(_processImg(imgPath,index,imgName,pid,sqlIns,mcIns))
+            if(_processImg(imgPath,index,imgName,pid,sqlIns,mcIns,wt,ht))
               //  mylogD("prcess img succ: %s , and small dir :%s, small img: %s , and md5dir:%s ,md5 img:%s ,pid: %d", imgPath.c_str(),smallDirPath.c_str(), smallImgPath.c_str(), md5DirPath.c_str(),md5ImgPath.c_str() ,pid );
                 mylogD("prcess img succ: %s", imgPath.c_str());
             else
@@ -151,6 +150,8 @@ int Worker::init(const Conf& conf)
     {
         _baseDir=conf._baseDir;
     }
+    _wt = conf._wt;
+    _ht = conf._ht;
     if( _sqlIns==NULL || _mcIns==NULL)
         return -1;
     return 0;
@@ -177,7 +178,7 @@ int Worker::unInit()
 int Worker::start()
 {
 	if(_p_processT==NULL)
-		_p_processT = new std::thread(Worker::_proessCb,_sqlIns,_mcIns);
+		_p_processT = new std::thread(Worker::_proessCb,_sqlIns,_mcIns,_wt,_ht);
 	return 0;
 }
 

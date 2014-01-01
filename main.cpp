@@ -21,6 +21,10 @@ void loadConf()
         }
         gConf._baseDir = (std::string) conf.Value("common","baseDir");
         gConf._pidFile = (std::string) conf.Value("common","pidFile");
+        
+        gConf._wt = (int) conf.Value("common","sw");
+        gConf._ht = (int) conf.Value("common","sh");
+        
         gConf._innerSize = (int) conf.Value("common","processInnerSize");
         gConf._dirSplitNum = (int)conf.Value("common","eachDir");
         gConf._pageCount = (int)conf.Value("common","pageCount");

@@ -41,6 +41,7 @@ struct Conf{
     std::string _sqlDb;
     std::string _mcIp;
     int _mcPort;
-
+    int _wt;
+    int _ht;
     int _splitNum; 
 };

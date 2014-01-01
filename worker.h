@@ -8,13 +8,15 @@ class Worker
 {
 private:
 	std::thread* _p_processT;
-	static bool _processImg(const std::string& inPath ,uint32_t index, const std::string& imgName, uint32_t pid,MYSQL* sqlIns ,memcached_st* mcIns);
-	static void _proessCb(MYSQL* sqlIns ,memcached_st* mcIns);
+	static bool _processImg(const std::string& inPath ,uint32_t index, const std::string& imgName, uint32_t pid,MYSQL* sqlIns ,memcached_st* mcIns,int wt,int ht);
+	static void _proessCb(MYSQL* sqlIns ,memcached_st* mcIns,int wt,int ht);
 	MYSQL* _sqlIns;
     memcached_st* _mcIns;
 	static uint32_t _sqlSplit;
 	static uint32_t _pageCount;
 	static std::string _baseDir;
+	int _wt;
+	int _ht;
 
 	Worker(Worker&){}
 	Worker& operator=(Worker&){}
